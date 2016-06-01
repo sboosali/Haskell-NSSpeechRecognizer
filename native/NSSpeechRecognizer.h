@@ -1,2 +1,2 @@
 
-const char* NSSpeechRecognizer();
+void NSSpeechRecognizer(const char*);

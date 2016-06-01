@@ -1,14 +1,13 @@
 module NSSpeechRecognizer.Bindings where
+import NSSpeechRecognizer.Types
 import NSSpeechRecognizer.Foreign
 
-import Foreign.C
+import Foreign (FunPtr)
+import Foreign.C (withCString)
 
 
 {-|
 
->>> _Playground
-"Playground"
-
 -}
-_NSSpeechRecognizer :: IO String
-_NSSpeechRecognizer = c_NSSpeechRecognizer >>= peekCString
+_NSSpeechRecognizer :: FunPtr RecognitionHandler -> String -> IO ()
+_NSSpeechRecognizer hs_f s = withCString s $ c_NSSpeechRecognizer hs_f

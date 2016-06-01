@@ -10,7 +10,7 @@ stack build && stack exec -- NSSpeechRecognizer-example
 -}
 main :: IO ()
 main = do
- print =<< _NSSpeechRecognizer
+ putStrLn ""
 
  f' <- newRecognitionHandler $ \s' -> do  -- "wrapper"
      s <- peekCString s'
@@ -21,3 +21,5 @@ main = do
  print f'
 
  withCString "wrapper/dynamic roundtrip" f
+
+ _NSSpeechRecognizer f' "Haskell calls ObjectiveC calls Haskell"

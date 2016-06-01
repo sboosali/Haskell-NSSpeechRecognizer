@@ -2,13 +2,16 @@
 module NSSpeechRecognizer.Foreign where
 import NSSpeechRecognizer.Types
 
-import Foreign
+import Foreign (FunPtr)
 import Foreign.C.String
 
 --------------------------------------------------------------------------------
 
 foreign import ccall safe "NSSpeechRecognizer.h NSSpeechRecognizer"
- c_NSSpeechRecognizer :: IO CString
+ c_NSSpeechRecognizer
+  :: FunPtr RecognitionHandler
+  -> CString
+  -> IO ()
 
 --------------------------------------------------------------------------------
 
