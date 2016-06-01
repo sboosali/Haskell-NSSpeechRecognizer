@@ -54,9 +54,11 @@ library
 
  exposed-modules:
   NSSpeechRecognizer
-  NSSpeechRecognizer.Main
+  NSSpeechRecognizer.Types
   NSSpeechRecognizer.Bindings
   NSSpeechRecognizer.Foreign
+
+  NSSpeechRecognizer.Example
 
  build-depends:
     base >=4.7 && <5

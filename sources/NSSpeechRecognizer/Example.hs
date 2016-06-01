@@ -1,6 +1,5 @@
-module NSSpeechRecognizer.Main where
-import NSSpeechRecognizer.Foreign
-import NSSpeechRecognizer.Bindings
+module NSSpeechRecognizer.Example where
+import NSSpeechRecognizer
 
 import Foreign.C.String
 
@@ -17,9 +16,8 @@ main = do
      s <- peekCString s'
      print s
 
- let f = fromRecognitionHandler f'        -- "dynamic"
+ let f = peekRecognitionHandler f'        -- "dynamic"
 
  print f'
 
- withCString "wrapper/dynamic roundtrip" $ \s' -> do
-      f s'
+ withCString "wrapper/dynamic roundtrip" f

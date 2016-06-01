@@ -1,5 +1,4 @@
 {-# OPTIONS_GHC -fno-warn-missing-signatures #-}
-import qualified NSSpeechRecognizer.Main
+import qualified NSSpeechRecognizer.Example
 
-main = NSSpeechRecognizer.Main.main
-
+main = NSSpeechRecognizer.Example.main
