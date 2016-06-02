@@ -35,6 +35,10 @@ library
 
  hs-source-dirs:      sources
  default-language:    Haskell2010
+ default-extensions:
+   AutoDeriveTypeable, DeriveDataTypeable, DeriveGeneric,
+   LambdaCase
+
  ghc-options:
   -Wall
   -fwarn-incomplete-uni-patterns
@@ -48,7 +52,10 @@ library
  include-dirs:     native
 
  cc-options: -fno-objc-arc
- -- -Wno-deprecated-declarations
+ -- we manually manage memory, with 'ForeignPtr';
+ -- we don't want the ObjC runtime to "autorelease" objects
+ -- that are still live in the eyes of the GHC runtime.
+ -- (don't know if necessary).
  ld-options: -ObjC
  frameworks: Cocoa
 
@@ -58,12 +65,16 @@ library
   NSSpeechRecognizer.Bindings
   NSSpeechRecognizer.Foreign
 
+-- other-modules:
   NSSpeechRecognizer.Example
+  NSSpeechRecognizer.Extra
 
  build-depends:
     base >=4.7 && <5
-  -- , lens
 
+  , stm
+
+  , data-default-class
 
 -- $ stack build && stack exec -- NSSpeechRecognizer-example
 executable NSSpeechRecognizer-example

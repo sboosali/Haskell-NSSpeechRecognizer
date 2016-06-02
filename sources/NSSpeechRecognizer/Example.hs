@@ -1,7 +1,12 @@
+
+{-|
+
+-}
 module NSSpeechRecognizer.Example where
 import NSSpeechRecognizer
 
 import Foreign.C.String
+import Foreign (FunPtr)
 
 {- |
 @
@@ -22,4 +27,7 @@ main = do
 
  withCString "wrapper/dynamic roundtrip" f
 
- _NSSpeechRecognizer f' "Haskell calls ObjectiveC calls Haskell"
+ test_NSSpeechRecognizer f' "Haskell calls ObjectiveC calls Haskell"
+
+test_NSSpeechRecognizer :: FunPtr RecognitionHandler -> String -> IO ()
+test_NSSpeechRecognizer hs_f s = withCString s $ c_NSSpeechRecognizer hs_f
