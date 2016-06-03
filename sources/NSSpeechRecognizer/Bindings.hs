@@ -10,8 +10,10 @@ import NSSpeechRecognizer.Foreign
 import NSSpeechRecognizer.Constants
 
 import Foreign (Ptr,FunPtr)
-import Foreign.C (CString, withCString)
+import Foreign.C (CString, newCString)
+import Foreign.Marshal (withArrayLen,free)
 import Control.Concurrent.STM
+-- import Data.List (genericLength)
 
 --------------------------------------------------------------------------------
 
@@ -61,9 +63,10 @@ pokeRecognizerForegroundOnly p = marshallForegroundOnly >>> setForegroundOnly_NS
 
 -- |
 pokeRecognizerVocabulary :: Ptr NSSpeechRecognizer -> Vocabulary -> IO ()
-pokeRecognizerVocabulary p vocabulary = do
-  c_vocabulary <- marshallVocabulary vocabulary
-  p `setCommands_NSSpeechRecognizer` c_vocabulary
+pokeRecognizerVocabulary p vocabulary = withCStringArrayLen vocabulary go
+  where
+  go (c_vocabulary, c_length) = do
+      setCommands_NSSpeechRecognizer p c_vocabulary c_length
 
 --------------------------------------------------------------------------------
 
@@ -79,9 +82,26 @@ marshallForegroundOnly = \case
  ForegroundOnly -> YES
  BackgroundAlso -> NO
 
+-- -- |
+-- marshallVocabulary :: Vocabulary -> IO NSVocabulary
+-- marshallVocabulary vocabulary = do
+--   return _TODO
+
 -- |
-marshallVocabulary :: Vocabulary -> IO NSVocabulary
-marshallVocabulary vocabulary = do
-  return _TODO
+withCStringArrayLen :: [String] -> (CStringArrayLen -> IO a) -> IO a
+withCStringArrayLen strings f = bracket _create _destroy _use
+  where
+  _create  = traverse newCString strings
+  _use     = \c_strings -> withArrayLen c_strings f'
+  _destroy = traverse_ free --TODO Does it know the right size?
+  f' = (flip . curry) f
+
+{-old
+
+c_strings <- newCString `traverse` strings
+a <- withArrayLen c_strings f'
+free `traverse_` c_strings
+
+-}
 
 --------------------------------------------------------------------------------

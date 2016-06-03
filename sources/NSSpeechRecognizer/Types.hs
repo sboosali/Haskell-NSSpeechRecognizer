@@ -8,61 +8,13 @@ import NSSpeechRecognizer.Extra
 
 import Data.Default.Class (Default(..))
 
+import Foreign (Ptr)
 import Foreign.C.String (CString)
 import Control.Concurrent.STM.TChan (TChan)
 import Data.Int(Int8)
 
 --------------------------------------------------------------------------------
-
-{-|
-
-@\<objc.h>@ defines:
-
-@
-typedef signed char BOOL;
-@
-
--}
-type BOOL = Int8
-
---------------------------------------------------------------------------------
-
-{-| Opaque.
-
-see
-<https://developer.apple.com/library/mac/documentation/Cocoa/Reference/ApplicationKit/Classes/NSSpeechRecognizer_Class/>
-
-Naming: a bit of a lie, actually has type @Recognizer@,
-which implements the @NSSpeechRecognizerDelegate@ interface,
-which wraps a @NSSpeechRecognizer@ objects.
-
--}
-data NSSpeechRecognizer
-
--- NSArrayOfNSString
-type NSVocabulary = () --TODO
-
-{-| A foreign pointer to a haskell function.
-
-@
--- A.hs
-hs_f :: FunPtr (CString -> IO ())
-@
-
-marshalls to:
-
-@
--- A.c
-void(*hs_f)(const char*)
-@
-
-see
-<https://hackage.haskell.org/package/base-4.9.0.0/docs/Foreign-Ptr.html#t:FunPtr>
-
--}
-type RecognitionHandler = CString -> IO ()
-
---------------------------------------------------------------------------------
+-- Haskell types
 
 {-| The complete state of an 'NSSpeechRecognizer'.
 
@@ -107,6 +59,78 @@ data ForegroundOnly = ForegroundOnly | BackgroundAlso -- TODO Monoid?
  deriving (Show,Read,Eq,Ord,Bounded,Enum,Data,Generic)
 
 --------------------------------------------------------------------------------
+-- Objective-C types
+
+{-|
+
+@\<objc.h>@ defines:
+
+@
+typedef signed char BOOL;
+@
+
+-}
+type BOOL = Int8
+
+--------------------------------------------------------------------------------
+
+{-| Opaque.
+
+see
+<https://developer.apple.com/library/mac/documentation/Cocoa/Reference/ApplicationKit/Classes/NSSpeechRecognizer_Class/>
+
+Naming: a bit of a lie, actually has type @Recognizer@,
+which implements the @NSSpeechRecognizerDelegate@ interface,
+which wraps a @NSSpeechRecognizer@ objects.
+
+-}
+data NSSpeechRecognizer
+
+{- |
+
+The native code marhsalls a 'CStringArrayLen' into a @NSArray<NSString*>*@
+
+Given a vocabulary with more than a thousand phrases,
+recognition is already less efficient and less accurate;
+so 'Int' is large enough.
+
+-}
+type NSVocabulary = CStringArrayLen --TODO
+
+{-| A foreign pointer to a haskell function.
+
+@
+-- A.hs
+hs_f :: FunPtr (CString -> IO ())
+@
+
+marshalls to:
+
+@
+-- A.c
+void(*hs_f)(const char*)
+@
+
+see
+<https://hackage.haskell.org/package/base-4.9.0.0/docs/Foreign-Ptr.html#t:FunPtr>
+
+-}
+type RecognitionHandler = CString -> IO ()
+
+--------------------------------------------------------------------------------
+-- C types
+
+-- |
+type CArray = Ptr
+
+-- | @char* a[];@ ~ @a :: Ptr (Ptr CChar)@
+type CStringArray = CArray CString
+
+-- | @(char* a[], int l)@ ~ @a :: (Ptr (Ptr CChar), CInt)@
+type CStringArrayLen = (CArray CString, Int)
+
+--------------------------------------------------------------------------------
+-- Values
 
 {-|
 

@@ -12,6 +12,7 @@ import GHC.Generics as X (Generic)
 import Control.Arrow as X ((>>>))
 import Data.Function as X ((&),on)
 import Data.Foldable as X (traverse_)
+import Control.Exception as X (bracket)
 
 (-:) :: a -> b -> (a,b)
 (-:) = (,)

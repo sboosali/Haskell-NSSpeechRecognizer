@@ -4,11 +4,11 @@
 
 -}
 module NSSpeechRecognizer.Foreign where
-import NSSpeechRecognizer.Extra
 import NSSpeechRecognizer.Types
 
 import Foreign (Ptr,FunPtr)
-import Foreign.C.String
+import Foreign.C (CString)
+-- import Foreign.C (CInt(..), CString)
 
 --------------------------------------------------------------------------------
 
@@ -60,7 +60,9 @@ foreign import ccall "Recognizer.h setExclusivity_NSSpeechRecognizer" setExclusi
 foreign import ccall "Recognizer.h setForegroundOnly_NSSpeechRecognizer" setForegroundOnly_NSSpeechRecognizer
  :: Ptr NSSpeechRecognizer -> BOOL -> IO ()
 
-setCommands_NSSpeechRecognizer = _TODO
+-- |
+foreign import ccall "Recognizer.h setCommands_NSSpeechRecognizer"    setCommands_NSSpeechRecognizer
+ :: Ptr NSSpeechRecognizer -> CArray CString -> Int -> IO ()
 
 -- |
 foreign import ccall "Recognizer.h registerHandler_NSSpeechRecognizer" registerHandler_NSSpeechRecognizer
