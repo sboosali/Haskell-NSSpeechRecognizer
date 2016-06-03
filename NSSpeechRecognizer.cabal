@@ -10,7 +10,6 @@ maintainer:          samboosalis@gmail.com
 copyright:           2016 Spiros Boosalis
 category:            Development
 build-type:          Simple
--- extra-source-files:
 cabal-version:       >=1.10
 
 -- PVP
@@ -46,9 +45,9 @@ library
   -fwarn-identities
   -fno-warn-unticked-promoted-constructors
 
- c-sources:        native/NSSpeechRecognizer.m
- includes:         native/NSSpeechRecognizer.h
- install-includes: native/NSSpeechRecognizer.h
+ c-sources:        native/Recognizer.m
+ includes:         native/Recognizer.h
+ install-includes: native/Recognizer.h
  include-dirs:     native
 
  cc-options: -fno-objc-arc

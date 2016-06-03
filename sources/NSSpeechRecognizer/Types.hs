@@ -35,7 +35,7 @@ marshalls to:
 
 @
 -- A.c
-void(*hs_f)(cort char*)
+void(*hs_f)(const char*)
 @
 
 see

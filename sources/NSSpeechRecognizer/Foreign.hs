@@ -12,7 +12,7 @@ import Foreign.C.String
 
 --------------------------------------------------------------------------------
 
-foreign import ccall safe "NSSpeechRecognizer.h NSSpeechRecognizer"
+foreign import ccall safe "Recognizer.h test_NSSpeechRecognizer"
  c_NSSpeechRecognizer
   :: FunPtr RecognitionHandler
   -> CString
