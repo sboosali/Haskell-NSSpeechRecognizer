@@ -20,19 +20,30 @@ import Control.Concurrent.STM
 -}
 pokeRecognizer :: Ptr NSSpeechRecognizer -> Recognizer -> IO ()
 pokeRecognizer p Recognizer{..} = do
-  p `pokeRecognizerState` rState
+  p `pokeRecognizerState`   rState
+  p `pokeRecognizerChannel` rChannel
 
-  c_handler <- channelRecognitionHandler rChannel
-  p `registerHandler_NSSpeechRecognizer` c_handler  -- safe? thread-safe? prop atomic.
+-- |
+pokeRecognizerChannel :: Ptr NSSpeechRecognizer -> TChan CString -> IO ()
+pokeRecognizerChannel p channel = do
+    c_handler <- channelRecognitionHandler channel
+    p `registerHandler_NSSpeechRecognizer` c_handler  -- safe? thread-safe? prop atomic.
 
+-- |
+channelRecognitionHandler :: TChan CString -> IO (FunPtr RecognitionHandler)
+channelRecognitionHandler channel = do
+  let handler = atomically . writeTChan channel
+  newRecognitionHandler handler
+
+--------------------------------------------------------------------------------
+
+-- |
 pokeRecognizerState :: Ptr NSSpeechRecognizer -> RecognizerState -> IO ()
 pokeRecognizerState p RecognizerState{..} = do
  p `pokeRecognizerStatus`         rStatus
  p `pokeRecognizerExclusivity`    rExclusivity
  p `pokeRecognizerForegroundOnly` rForegroundOnly
  p `pokeRecognizerVocabulary`     rVocabulary
-
---------------------------------------------------------------------------------
 
 -- |   -- _TODO idempotent?
 pokeRecognizerStatus :: Ptr NSSpeechRecognizer -> Status -> IO ()
@@ -56,12 +67,6 @@ pokeRecognizerVocabulary p vocabulary = do
 
 --------------------------------------------------------------------------------
 
--- |
-channelRecognitionHandler :: TChan CString -> IO (FunPtr RecognitionHandler)
-channelRecognitionHandler channel = do
-  let handler = atomically . writeTChan channel
-  newRecognitionHandler handler
-
 -- | @blocksOtherRecognizers@
 marshallExclusivity :: Exclusivity -> BOOL
 marshallExclusivity = \case
@@ -78,3 +83,5 @@ marshallForegroundOnly = \case
 marshallVocabulary :: Vocabulary -> IO NSVocabulary
 marshallVocabulary vocabulary = do
   return _TODO
+
+--------------------------------------------------------------------------------

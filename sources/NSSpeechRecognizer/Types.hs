@@ -102,7 +102,7 @@ data Status = On | Off
 data Exclusivity = Inclusive | Exclusive -- TODO Monoid Any?
  deriving (Show,Read,Eq,Ord,Bounded,Enum,Data,Generic)
 
- -- | 'Bool'-like.
+-- | 'Bool'-like.
 data ForegroundOnly = ForegroundOnly | BackgroundAlso -- TODO Monoid?
  deriving (Show,Read,Eq,Ord,Bounded,Enum,Data,Generic)
 

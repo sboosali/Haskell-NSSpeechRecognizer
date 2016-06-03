@@ -44,15 +44,15 @@ foreign import ccall "Recognizer.h new_NSSpeechRecognizer"   new_NSSpeechRecogni
 foreign import ccall "Recognizer.h free_NSSpeechRecognizer"  free_NSSpeechRecognizer
  :: Ptr NSSpeechRecognizer -> IO ()
 
- -- |
+-- |
 foreign import ccall "Recognizer.h start_NSSpeechRecognizer" start_NSSpeechRecognizer
  :: Ptr NSSpeechRecognizer -> IO ()
 
- -- |
+-- |
 foreign import ccall "Recognizer.h stop_NSSpeechRecognizer"  stop_NSSpeechRecognizer
  :: Ptr NSSpeechRecognizer -> IO ()
 
- -- |
+-- |
 foreign import ccall "Recognizer.h setExclusivity_NSSpeechRecognizer" setExclusivity_NSSpeechRecognizer
  :: Ptr NSSpeechRecognizer -> BOOL -> IO ()
 
