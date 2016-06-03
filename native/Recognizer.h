@@ -24,7 +24,7 @@ void test_NSSpeechRecognizer(void(*f)(const char*), const char* s);
 
 ////////////////////////////////////////////////////////////////////////////////
 
-Recognizer* new_NSSpeechRecognizer();
+Recognizer* init_NSSpeechRecognizer();
 
 void free_NSSpeechRecognizer(Recognizer*);
 
@@ -32,8 +32,12 @@ void start_NSSpeechRecognizer(Recognizer*);
 
 void stop_NSSpeechRecognizer(Recognizer*);
 
+void setExclusivity_NSSpeechRecognizer(Recognizer*, BOOL);
+
+void setForegroundOnly_NSSpeechRecognizer(Recognizer*, BOOL);
+
 void setCommands_NSSpeechRecognizer(Recognizer*, const char* [], int length);
 
-void setHandler_NSSpeechRecognizer(Recognizer* this, void(*handler)(const char*));
+void registerHandler_NSSpeechRecognizer(Recognizer* this, void(*handler)(const char*));
 
 ////////////////////////////////////////////////////////////////////////////////

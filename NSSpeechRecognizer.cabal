@@ -63,6 +63,7 @@ library
   NSSpeechRecognizer.Types
   NSSpeechRecognizer.Bindings
   NSSpeechRecognizer.Foreign
+  NSSpeechRecognizer.Constants
 
 -- other-modules:
   NSSpeechRecognizer.Example

@@ -7,50 +7,74 @@ module NSSpeechRecognizer.Bindings where
 import NSSpeechRecognizer.Extra
 import NSSpeechRecognizer.Types
 import NSSpeechRecognizer.Foreign
+import NSSpeechRecognizer.Constants
 
-import Foreign (FunPtr)
+import Foreign (Ptr,FunPtr)
 import Foreign.C (CString, withCString)
 import Control.Concurrent.STM
+
+--------------------------------------------------------------------------------
 
 {-|
 
 -}
-pokeRecognizer :: NSSpeechRecognizer -> Recognizer -> IO ()
+pokeRecognizer :: Ptr NSSpeechRecognizer -> Recognizer -> IO ()
 pokeRecognizer p Recognizer{..} = do
   p `pokeRecognizerState` rState
 
-  c_callback <- channelRecognitionHandler rChannel
-  p `setCallback_NSSpeechRecognizer` c_callback  -- safe? thread-safe? prop atomic.
+  c_handler <- channelRecognitionHandler rChannel
+  p `registerHandler_NSSpeechRecognizer` c_handler  -- safe? thread-safe? prop atomic.
 
-pokeRecognizerState :: NSSpeechRecognizer -> RecognizerState -> IO ()
+pokeRecognizerState :: Ptr NSSpeechRecognizer -> RecognizerState -> IO ()
 pokeRecognizerState p RecognizerState{..} = do
- p `pokeRecognizerVocabulary`  rVocabulary
- p `pokeRecognizerStatus`      rStatus
- p `pokeRecognizerExclusivity` rExclusivity
+ p `pokeRecognizerStatus`         rStatus
+ p `pokeRecognizerExclusivity`    rExclusivity
+ p `pokeRecognizerForegroundOnly` rForegroundOnly
+ p `pokeRecognizerVocabulary`     rVocabulary
 
-pokeRecognizerVocabulary :: NSSpeechRecognizer -> Vocabulary -> IO ()
-pokeRecognizerVocabulary p vocabulary = do
-  c_vocabulary <- marshallVocabulary vocabulary
-  p `setCommands_NSSpeechRecognizer` c_vocabulary
+--------------------------------------------------------------------------------
 
 -- |   -- _TODO idempotent?
-pokeRecognizerStatus :: NSSpeechRecognizer -> Status -> IO ()
+pokeRecognizerStatus :: Ptr NSSpeechRecognizer -> Status -> IO ()
 pokeRecognizerStatus p = \case
   On  -> p & start_NSSpeechRecognizer
   Off -> p & stop_NSSpeechRecognizer
 
 -- |
-pokeRecognizerExclusivity :: NSSpeechRecognizer -> Exclusivity -> IO ()
-pokeRecognizerExclusivity p = \case
-  Inclusive -> p `setExclusivity_NSSpeechRecognizer` 0
-  Exclusive -> p `setExclusivity_NSSpeechRecognizer` 1
+pokeRecognizerExclusivity :: Ptr NSSpeechRecognizer -> Exclusivity -> IO ()
+pokeRecognizerExclusivity p = marshallExclusivity >>> setExclusivity_NSSpeechRecognizer p
+
+-- |
+pokeRecognizerForegroundOnly :: Ptr NSSpeechRecognizer -> ForegroundOnly -> IO ()
+pokeRecognizerForegroundOnly p = marshallForegroundOnly >>> setForegroundOnly_NSSpeechRecognizer p
+
+-- |
+pokeRecognizerVocabulary :: Ptr NSSpeechRecognizer -> Vocabulary -> IO ()
+pokeRecognizerVocabulary p vocabulary = do
+  c_vocabulary <- marshallVocabulary vocabulary
+  p `setCommands_NSSpeechRecognizer` c_vocabulary
+
+--------------------------------------------------------------------------------
 
 -- |
 channelRecognitionHandler :: TChan CString -> IO (FunPtr RecognitionHandler)
 channelRecognitionHandler channel = do
-  let callback = atomically . writeTChan channel
-  newRecognitionHandler callback
+  let handler = atomically . writeTChan channel
+  newRecognitionHandler handler
 
+-- | @blocksOtherRecognizers@
+marshallExclusivity :: Exclusivity -> BOOL
+marshallExclusivity = \case
+ Exclusive -> YES
+ Inclusive -> NO
+
+-- | @listensInForegroundOnly@
+marshallForegroundOnly :: ForegroundOnly -> BOOL
+marshallForegroundOnly = \case
+ ForegroundOnly -> YES
+ BackgroundAlso -> NO
+
+-- |
 marshallVocabulary :: Vocabulary -> IO NSVocabulary
 marshallVocabulary vocabulary = do
   return _TODO

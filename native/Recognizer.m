@@ -120,6 +120,14 @@ void stop_NSSpeechRecognizer(Recognizer* this) {
     [this.recognizer stopListening];
 }
 
+void setExclusivity_NSSpeechRecognizer(Recognizer* r, BOOL b) {
+    r.recognizer.blocksOtherRecognizers = b;
+}
+
+void setForegroundOnly_NSSpeechRecognizer(Recognizer* r, BOOL b) {
+    r.recognizer.listensInForegroundOnly = b;
+}
+
 // {{ const char* _[] }} is an array of strings
 // {{ void* a[l] }} is a "variable length arrays". its lifetime is the block's.
 void setCommands_NSSpeechRecognizer(Recognizer* this, const char* _commands[], int length){
@@ -128,7 +136,7 @@ void setCommands_NSSpeechRecognizer(Recognizer* this, const char* _commands[], i
     this.recognizer.commands = commands;
 }
 
-void setHandler_NSSpeechRecognizer(Recognizer* this, void(*handler)(const char*)){
+void registerHandler_NSSpeechRecognizer(Recognizer* this, void(*handler)(const char*)){
     this.handler = handler;
 }
 

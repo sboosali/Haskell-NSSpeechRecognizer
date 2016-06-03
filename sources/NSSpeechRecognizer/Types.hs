@@ -10,6 +10,20 @@ import Data.Default.Class (Default(..))
 
 import Foreign.C.String (CString)
 import Control.Concurrent.STM.TChan (TChan)
+import Data.Int(Int8)
+
+--------------------------------------------------------------------------------
+
+{-|
+
+@\<objc.h>@ defines:
+
+@
+typedef signed char BOOL;
+@
+
+-}
+type BOOL = Int8
 
 --------------------------------------------------------------------------------
 
@@ -18,11 +32,15 @@ import Control.Concurrent.STM.TChan (TChan)
 see
 <https://developer.apple.com/library/mac/documentation/Cocoa/Reference/ApplicationKit/Classes/NSSpeechRecognizer_Class/>
 
+Naming: a bit of a lie, actually has type @Recognizer@,
+which implements the @NSSpeechRecognizerDelegate@ interface,
+which wraps a @NSSpeechRecognizer@ objects.
+
 -}
 data NSSpeechRecognizer
 
 -- NSArrayOfNSString
-type NSVocabulary = ()
+type NSVocabulary = () --TODO
 
 {-| A foreign pointer to a haskell function.
 
@@ -53,7 +71,7 @@ Can be @poke@d into the pointer.
 -}
 data Recognizer = Recognizer
  { rState    :: RecognizerState
- , rChannel  :: TChan CString --TODO mapChan to string
+ , rChannel  :: TChan CString --TODO mapTChan to string?
  } deriving (Eq)
 
 {-| The part of the state of a 'Recognizer' that is "simple"
@@ -61,12 +79,13 @@ data Recognizer = Recognizer
 
 -}
 data RecognizerState = RecognizerState
- { rVocabulary  :: Vocabulary
- , rStatus      :: Status
- , rExclusivity :: Exclusivity
+ { rVocabulary     :: Vocabulary
+ , rStatus         :: Status
+ , rExclusivity    :: Exclusivity
+ , rForegroundOnly :: ForegroundOnly
  } deriving (Show,Read,Eq,Ord,Data,Generic)
--- instance NFData MouseButton
--- instance Hashable MouseButton
+-- instance NFData RecognizerState
+-- instance Hashable RecognizerState
 -- instance IsList RecognizerState?
 
 -- | 'defaultRecognizerState'
@@ -83,16 +102,28 @@ data Status = On | Off
 data Exclusivity = Inclusive | Exclusive -- TODO Monoid Any?
  deriving (Show,Read,Eq,Ord,Bounded,Enum,Data,Generic)
 
+ -- | 'Bool'-like.
+data ForegroundOnly = ForegroundOnly | BackgroundAlso -- TODO Monoid?
+ deriving (Show,Read,Eq,Ord,Bounded,Enum,Data,Generic)
+
 --------------------------------------------------------------------------------
 
 {-|
+
+@
+'rVocabulary'     = []
+'rStatus'         = 'On'
+'rExclusivity'    = 'Inclusive'
+'rForegroundOnly' = 'BackgroundAlso'
+@
 
 -}
 defaultRecognizerState :: RecognizerState
 defaultRecognizerState = RecognizerState{..}
   where
-  rVocabulary  = []
-  rStatus      = On
-  rExclusivity = Inclusive
+  rVocabulary     = []
+  rStatus         = On
+  rExclusivity    = Inclusive
+  rForegroundOnly = BackgroundAlso
 
 --------------------------------------------------------------------------------
