@@ -9,10 +9,10 @@ import NSSpeechRecognizer.Types
 import NSSpeechRecognizer.Foreign
 import NSSpeechRecognizer.Constants
 
-import Foreign (Ptr,FunPtr)
-import Foreign.C (CString, newCString)
+import Foreign (Ptr)
+import Foreign.C (newCString)
 import Foreign.Marshal (withArrayLen,free)
-import Control.Concurrent.STM
+-- import Control.Concurrent.STM
 -- import Data.List (genericLength)
 
 --------------------------------------------------------------------------------
@@ -31,19 +31,25 @@ newNSSpeechRecognizer recognizer = do
 pokeRecognizer :: Ptr NSSpeechRecognizer -> Recognizer -> IO ()
 pokeRecognizer p Recognizer{..} = do
   p `pokeRecognizerState`   rState
-  p `pokeRecognizerChannel` rChannel
+  p `pokeRecognizerHandler` rHandler
+  -- p `pokeRecognizerChannel` rChannel
 
--- |
-pokeRecognizerChannel :: Ptr NSSpeechRecognizer -> TChan CString -> IO ()
-pokeRecognizerChannel p channel = do
-    c_handler <- channelRecognitionHandler channel
-    p `registerHandler_NSSpeechRecognizer` c_handler  -- safe? thread-safe? prop atomic.
+pokeRecognizerHandler :: Ptr NSSpeechRecognizer -> RecognitionHandler -> IO ()
+pokeRecognizerHandler p handler = do
+  hs_handler <- newRecognitionHandler handler
+  p `registerHandler_NSSpeechRecognizer` hs_handler
 
--- |
-channelRecognitionHandler :: TChan CString -> IO (FunPtr RecognitionHandler)
-channelRecognitionHandler channel = do
-  let handler = atomically . writeTChan channel
-  newRecognitionHandler handler
+-- -- |
+-- pokeRecognizerChannel :: Ptr NSSpeechRecognizer -> TChan CString -> IO ()
+-- pokeRecognizerChannel p channel = do
+--     c_handler <- channelRecognitionHandler channel
+--     p `registerHandler_NSSpeechRecognizer` c_handler  -- safe? thread-safe? prop atomic.
+--
+-- -- |
+-- channelRecognitionHandler :: TChan CString -> IO (FunPtr RecognitionHandler)
+-- channelRecognitionHandler channel = do
+--   let handler = atomically . writeTChan channel
+--   newRecognitionHandler handler
 
 --------------------------------------------------------------------------------
 

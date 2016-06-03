@@ -72,6 +72,10 @@ void test_NSSpeechRecognizer(void(*f)(const char*), const char* s) {
   f(s);
 }
 
+void beginRunLoop() {
+    [[NSRunLoop currentRunLoop] run];
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 
 @implementation Recognizer

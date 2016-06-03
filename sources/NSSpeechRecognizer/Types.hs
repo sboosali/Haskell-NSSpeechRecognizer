@@ -10,7 +10,7 @@ import Data.Default.Class (Default(..))
 
 import Foreign (Ptr)
 import Foreign.C.String (CString)
-import Control.Concurrent.STM.TChan (TChan)
+-- import Control.Concurrent.STM.TChan (TChan)
 import Data.Int(Int8)
 
 --------------------------------------------------------------------------------
@@ -23,8 +23,10 @@ Can be @poke@d into the pointer.
 -}
 data Recognizer = Recognizer
  { rState    :: RecognizerState
- , rChannel  :: TChan CString --TODO mapTChan to string?
- } deriving (Eq)
+ , rHandler  :: RecognitionHandler
+ -- , rChannel  :: TChan CString --TODO mapTChan to string?
+ }
+ -- deriving (Eq)
 
 {-| The part of the state of a 'Recognizer' that is "simple"
 (i.e. can one derive the standard instances for).
@@ -133,10 +135,15 @@ type CStringArrayLen = (CArray CString, Int)
 -- Values
 
 -- |
-defaultRecognizer :: TChan CString -> Recognizer
-defaultRecognizer rChannel = Recognizer{..}
+defaultRecognizer :: RecognitionHandler -> Recognizer
+defaultRecognizer rHandler = Recognizer{..}
   where
   rState = defaultRecognizerState
+
+-- defaultRecognizer :: TChan CString -> Recognizer
+-- defaultRecognizer rChannel = Recognizer{..}
+--   where
+--   rState = defaultRecognizerState
 
 {-|
 

@@ -18,6 +18,10 @@ foreign import ccall safe "Recognizer.h test_NSSpeechRecognizer"
   -> CString
   -> IO ()
 
+-- | @= [[NSRunLoop currentRunLoop] run];@
+foreign import ccall "Recognizer.h beginRunLoop" beginRunLoop
+ :: IO ()
+
 --------------------------------------------------------------------------------
 
 foreign import ccall "wrapper"

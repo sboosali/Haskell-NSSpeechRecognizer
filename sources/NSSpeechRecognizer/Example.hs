@@ -8,9 +8,9 @@ import NSSpeechRecognizer
 
 import Foreign.C.String (withCString,peekCString)
 import Foreign (FunPtr)
-import Control.Concurrent.STM (newTChanIO,readTChan, atomically)
+-- import Control.Concurrent.STM (newTChanIO,readTChan, atomically)
 import Control.Monad (forever)
-import Control.Concurrent (forkIO)
+import Control.Concurrent (forkIO,threadDelay)
 
 --------------------------------------------------------------------------------
 
@@ -50,17 +50,22 @@ mainRecognizer = do
  putStrLn "\nrecognizing…\n"
 
  let rState = defaultRecognizerState {rVocabulary = ["start listening","stop listening"]}
- rChannel <- newTChanIO
+
+ let rHandler = printerHandler
 
  ns_thread <- forkIO $ do
-   let recognizer = Recognizer {rState, rChannel}
+   let recognizer = Recognizer {rState, rHandler}
    ns_recognizer <- newNSSpeechRecognizer recognizer
-   putStrLn "(NSSpeechRecognizer)"
+   putStrLn "(NSSpeechRecognizer Started)"
+   beginRunLoop
+   putStrLn "(NSRunLoop Ended)" -- shouldn't be seen, but is!
 
  forever $ do
-    putStrLn "(waiting)"
-    c_recognition <- atomically $ readTChan rChannel
-    recognition <- peekCString c_recognition
-    print recognition
+   threadDelay 1000000
+
+printerHandler c_recognition = do
+  putStrLn "(handling...)"
+  recognition <- peekCString c_recognition
+  print recognition
 
 --------------------------------------------------------------------------------
