@@ -132,6 +132,12 @@ type CStringArrayLen = (CArray CString, Int)
 --------------------------------------------------------------------------------
 -- Values
 
+-- |
+defaultRecognizer :: TChan CString -> Recognizer
+defaultRecognizer rChannel = Recognizer{..}
+  where
+  rState = defaultRecognizerState
+
 {-|
 
 @

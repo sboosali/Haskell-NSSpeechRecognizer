@@ -17,6 +17,14 @@ import Control.Concurrent.STM
 
 --------------------------------------------------------------------------------
 
+newNSSpeechRecognizer :: Recognizer -> IO (Ptr NSSpeechRecognizer)
+newNSSpeechRecognizer recognizer = do
+  p <- new_NSSpeechRecognizer
+  p `pokeRecognizer` recognizer
+  return p
+
+--------------------------------------------------------------------------------
+
 {-|
 
 -}
