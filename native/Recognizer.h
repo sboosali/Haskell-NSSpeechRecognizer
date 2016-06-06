@@ -7,7 +7,8 @@
 
 void test_NSSpeechRecognizer(void(*f)(const char*), const char* s);
 
-void beginRunLoop();
+void beginCurrentRunLoop();
+void beginMainRunLoop();
 
 ////////////////////////////////////////////////////////////////////////////////
 

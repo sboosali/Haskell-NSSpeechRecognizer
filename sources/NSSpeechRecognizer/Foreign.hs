@@ -19,8 +19,13 @@ foreign import ccall safe "Recognizer.h test_NSSpeechRecognizer"
   -> IO ()
 
 -- | @= [[NSRunLoop currentRunLoop] run];@
-foreign import ccall "Recognizer.h beginRunLoop" beginRunLoop
+foreign import ccall safe "Recognizer.h beginCurrentRunLoop" beginCurrentRunLoop --NOTE unsafe?
  :: IO ()
+
+-- | @= [[NSRunLoop mainRunLoop] run];@
+foreign import ccall safe "Recognizer.h beginMainRunLoop" beginMainRunLoop --NOTE unsafe?
+ :: IO ()
+
 
 --------------------------------------------------------------------------------
 
