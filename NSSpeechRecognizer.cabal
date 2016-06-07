@@ -64,6 +64,7 @@ library
   NSSpeechRecognizer.Bindings
   NSSpeechRecognizer.Foreign
   NSSpeechRecognizer.Constants
+  NSSpeechRecognizer.Utilities
 
 -- other-modules:
   NSSpeechRecognizer.Example
@@ -73,6 +74,7 @@ library
     base >=4.7 && <5
 
   , stm
+  , containers
 
   , data-default-class
 

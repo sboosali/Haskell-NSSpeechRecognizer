@@ -1,4 +1,5 @@
 {-# LANGUAGE NamedFieldPuns #-}
+{-# OPTIONS_GHC -fno-warn-missing-signatures #-}
 
 {-|
 
@@ -9,8 +10,9 @@ import NSSpeechRecognizer
 import Foreign.C.String (withCString,peekCString)
 import Foreign (FunPtr)
 -- import Control.Concurrent.STM (newTChanIO,readTChan, atomically)
-import Control.Monad (forever)
+import Control.Monad (forever) -- ,replicateM_)
 import Control.Concurrent (forkIO,threadDelay) -- forkOS
+import Control.Exception (throwIO,AsyncException(..))
 
 --------------------------------------------------------------------------------
 
@@ -22,7 +24,8 @@ stack build && stack exec -- NSSpeechRecognizer-example
 main :: IO ()
 main = do
  mainRoundtrip
- mainRecognizer
+ -- mainRecognizer
+ mainVoiceMap
 
 --------------------------------------------------------------------------------
 
@@ -46,7 +49,7 @@ test_NSSpeechRecognizer hs_f s = withCString s $ c_NSSpeechRecognizer hs_f
 
 --------------------------------------------------------------------------------
 
-hang = forever $ do
+hang = forever $
    threadDelay 1000000
 
 mainRecognizer = do
@@ -65,7 +68,7 @@ mainRecognizer = do
  --   hang
 
  let recognizer = Recognizer {rState, rHandler}
- ns_recognizer <- newNSSpeechRecognizer recognizer
+ _ns_recognizer <- newNSSpeechRecognizer recognizer
  putStrLn "(NSSpeechRecognizer Started)"
 
  _thread <- forkIO $ do
@@ -76,14 +79,15 @@ mainRecognizer = do
  beginCurrentRunLoop -- NOTE the NSRunLoop *must* be run on the main thread, It seems
  putStrLn "(ERROR NSRunLoop ended)" -- isn't seen
 
-{-TODO
 
-needs 2 C-c
+{-TODO: why's it need 2 C-c?
 
-solutions:(?)
+attempts:
 -threaded
 ccall safe
 main thread
+
+C-\ (i.e. SIGQUIT) works
 
 -}
 
@@ -91,5 +95,30 @@ printerHandler c_recognition = do
   putStrLn ""
   recognition <- peekCString c_recognition
   print recognition
+
+--------------------------------------------------------------------------------
+
+mainVoiceMap = do
+  recognizeVoiceMap
+   [ "start listening"-: putStrLn "started listening" --TODO Extend example to actually enable more vocabularies in these two, on the recognition of start listening
+   , "stop listening"-: throwIO UserInterrupt
+   ]
+
+{-old
+
+Activating the nsrunloop seems to demand two C-c's.
+
+#1.
+
+twice doesn't even work:
+, "stop listening"-: sequence_ [throwIO UserInterrupt, threadDelay (1000*1000), throwIO UserInterrupt]
+
+#2.
+
+, "stop listening"-: throwIO ThreadKilled
+
+But is it safe? With some system resource be freed?
+
+-}
 
 --------------------------------------------------------------------------------

@@ -18,14 +18,23 @@ foreign import ccall safe "Recognizer.h test_NSSpeechRecognizer"
   -> CString
   -> IO ()
 
--- | @= [[NSRunLoop currentRunLoop] run];@
+-- | @= [[NSRunLoop currentRunLoop] run];@. Doesn't return.
 foreign import ccall safe "Recognizer.h beginCurrentRunLoop" beginCurrentRunLoop --NOTE unsafe?
  :: IO ()
 
--- | @= [[NSRunLoop mainRunLoop] run];@
+-- | @= [[NSRunLoop mainRunLoop] run];@. Doesn't return.
 foreign import ccall safe "Recognizer.h beginMainRunLoop" beginMainRunLoop --NOTE unsafe?
  :: IO ()
 
+{-old
+
+Unacceptable result type in foreign declaration:
+ ‘a’ is not a data type
+When checking declaration:
+ foreign import ccall safe "static Recognizer.h beginMainRunLoop" beginMainRunLoop
+   :: IO a
+
+-}
 
 --------------------------------------------------------------------------------
 

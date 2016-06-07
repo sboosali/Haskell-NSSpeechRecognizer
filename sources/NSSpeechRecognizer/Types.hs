@@ -82,8 +82,10 @@ see
 <https://developer.apple.com/library/mac/documentation/Cocoa/Reference/ApplicationKit/Classes/NSSpeechRecognizer_Class/>
 
 Naming: a bit of a lie, actually has type @Recognizer@,
-which implements the @NSSpeechRecognizerDelegate@ interface,
-which wraps a @NSSpeechRecognizer@ objects.
+which
+
+* implements the @NSSpeechRecognizerDelegate@ interface, and
+* wraps a @NSSpeechRecognizer@ object.
 
 -}
 data NSSpeechRecognizer
@@ -118,6 +120,10 @@ see
 
 -}
 type RecognitionHandler = CString -> IO ()
+--TODO type CRecognitionHandler = CString -> IO ()
+--TODO type RecognitionHandler = String -> IO ()
+-- :: RecognitionHandler -> CRecognitionHandler
+-- = (peekCString >=>)
 
 --------------------------------------------------------------------------------
 -- C types
@@ -130,6 +136,15 @@ type CStringArray = CArray CString
 
 -- | @(char* a[], int l)@ ~ @a :: (Ptr (Ptr CChar), CInt)@
 type CStringArrayLen = (CArray CString, Int)
+
+--------------------------------------------------------------------------------
+
+{-| Map a set of phrases to actions.
+
+Naming: like "keymap".
+
+-}
+type VoiceMap = [(String, IO ())]
 
 --------------------------------------------------------------------------------
 -- Values

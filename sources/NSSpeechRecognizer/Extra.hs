@@ -13,10 +13,10 @@ import Control.Arrow as X ((>>>))
 import Data.Function as X ((&),on)
 import Data.Foldable as X (traverse_)
 import Control.Exception as X (bracket)
+import Control.Monad as X ((>=>))
 
-(-:) :: a -> b -> (a,b)
-(-:) = (,)
-infix 1 -:
+nothing :: (Monad m) => m ()
+nothing = return ()
 
 _TODO :: a --TODO call stack / warning
 _TODO = error "TODO"
