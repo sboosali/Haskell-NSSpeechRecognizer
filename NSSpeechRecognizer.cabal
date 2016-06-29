@@ -71,12 +71,13 @@ library
   NSSpeechRecognizer.Extra
 
  build-depends:
-    base >=4.7 && <5
+               base >=4.7 && <5
+             , stm
+             , containers
 
-  , stm
-  , containers
+             , microlens-platform
+             , data-default-class
 
-  , data-default-class
 
 -- $ stack build && stack exec -- NSSpeechRecognizer-example
 executable NSSpeechRecognizer-example

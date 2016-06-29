@@ -11,7 +11,7 @@ import Foreign.C.String (withCString,peekCString)
 import Foreign (FunPtr)
 -- import Control.Concurrent.STM (newTChanIO,readTChan, atomically)
 import Control.Monad (forever) -- ,replicateM_)
-import Control.Concurrent (forkIO,threadDelay) -- forkOS
+import Control.Concurrent (forkIO,forkOS,threadDelay) -- 
 import Control.Exception (throwIO,AsyncException(..))
 
 --------------------------------------------------------------------------------
@@ -23,9 +23,10 @@ stack build && stack exec -- NSSpeechRecognizer-example
 -}
 main :: IO ()
 main = do
- mainRoundtrip
+ -- mainRoundtrip
  -- mainRecognizer
- mainVoiceMap
+ mainRecognizerBackground
+ -- mainVoiceMap
 
 --------------------------------------------------------------------------------
 
@@ -59,14 +60,6 @@ mainRecognizer = do
 
  let rHandler = printerHandler
 
- -- ns_thread <- forkOS $ do
- --   let recognizer = Recognizer {rState, rHandler}
- --   ns_recognizer <- newNSSpeechRecognizer recognizer
- --   putStrLn "(NSSpeechRecognizer Started)"
- --   beginMainRunLoop
- --   putStrLn "(NSRunLoop Ended)" -- shouldn't be seen, but is!
- --   hang
-
  let recognizer = Recognizer {rState, rHandler}
  _ns_recognizer <- newNSSpeechRecognizer recognizer
  putStrLn "(NSSpeechRecognizer Started)"
@@ -76,9 +69,24 @@ mainRecognizer = do
      putStrLn "(Child Thread Runs)"
      threadDelay 1000000
 
- beginCurrentRunLoop -- NOTE the NSRunLoop *must* be run on the main thread, It seems
+ beginRunLoop -- NOTE the NSRunLoop *must* be run on the main thread, It seems
  putStrLn "(ERROR NSRunLoop ended)" -- isn't seen
 
+
+mainRecognizerBackground = do --TODO Try to get this to work on non-main threads
+
+ let rState = defaultRecognizerState {rVocabulary = ["start listening","stop listening"]}
+
+ let rHandler = printerHandler
+
+ _ns_thread <- forkOS $ do
+   let recognizer = Recognizer {rState, rHandler}
+   _ns_recognizer <- newNSSpeechRecognizer recognizer
+   putStrLn "(NSSpeechRecognizer Started)"
+   beginMainRunLoop
+   putStrLn "(NSRunLoop Ended)" -- shouldn't be seen, but is!
+
+ hang
 
 {-TODO: why's it need 2 C-c?
 

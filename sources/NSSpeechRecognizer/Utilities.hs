@@ -37,11 +37,18 @@ NOTE must be called on the main thread.
 
 Doesn't return.
 
+@
+recognizeVoiceMap = 'foreverRecognizer' . 'aVoiceMapRecognizer'
+@
+
 -}
 recognizeVoiceMap :: VoiceMap -> IO ()
-recognizeVoiceMap mapping = do
-  _ <- newNSSpeechRecognizer (aVoiceMapRecognizer mapping)
-  beginCurrentRunLoop
+recognizeVoiceMap mapping = foreverRecognizer (aVoiceMapRecognizer mapping)
+
+foreverRecognizer :: Recognizer -> IO ()
+foreverRecognizer recognizer = do
+ _ <- newNSSpeechRecognizer recognizer
+ beginCurrentRunLoop
 
 aVoiceMapRecognizer :: VoiceMap -> Recognizer
 aVoiceMapRecognizer (Map.fromList -> mapping) = Recognizer{..}

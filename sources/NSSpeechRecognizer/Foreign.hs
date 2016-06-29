@@ -1,4 +1,4 @@
-{-# LANGUAGE ForeignFunctionInterface #-}
+{-# LANGUAGE ForeignFunctionInterface, InterruptibleFFI #-}
 
 {-|
 
@@ -19,11 +19,11 @@ foreign import ccall safe "Recognizer.h test_NSSpeechRecognizer"
   -> IO ()
 
 -- | @= [[NSRunLoop currentRunLoop] run];@. Doesn't return.
-foreign import ccall safe "Recognizer.h beginCurrentRunLoop" beginCurrentRunLoop --NOTE unsafe?
+foreign import ccall interruptible "Recognizer.h beginCurrentRunLoop" beginCurrentRunLoop --NOTE TODO interruptible?
  :: IO ()
 
 -- | @= [[NSRunLoop mainRunLoop] run];@. Doesn't return.
-foreign import ccall safe "Recognizer.h beginMainRunLoop" beginMainRunLoop --NOTE unsafe?
+foreign import ccall interruptible "Recognizer.h beginMainRunLoop" beginMainRunLoop --NOTE interruptible?
  :: IO ()
 
 {-old

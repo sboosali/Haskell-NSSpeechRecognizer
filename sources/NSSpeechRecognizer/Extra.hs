@@ -15,8 +15,15 @@ import Data.Foldable as X (traverse_)
 import Control.Exception as X (bracket)
 import Control.Monad as X ((>=>))
 
+import Control.Exception (ErrorCall(..))
+import Control.Exception (throwIO)
+
 nothing :: (Monad m) => m ()
 nothing = return ()
 
 _TODO :: a --TODO call stack / warning
 _TODO = error "TODO"
+
+throwS :: String -> IO a
+throwS = ErrorCall >>> throwIO
+

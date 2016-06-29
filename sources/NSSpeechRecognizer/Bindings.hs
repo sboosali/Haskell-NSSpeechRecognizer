@@ -12,16 +12,35 @@ import NSSpeechRecognizer.Constants
 import Foreign (Ptr)
 import Foreign.C (newCString)
 import Foreign.Marshal (withArrayLen,free)
+import Control.Concurrent (myThreadId)
 -- import Control.Concurrent.STM
 -- import Data.List (genericLength)
 
 --------------------------------------------------------------------------------
 
+{-|
+
+-}
 newNSSpeechRecognizer :: Recognizer -> IO (Ptr NSSpeechRecognizer)
 newNSSpeechRecognizer recognizer = do
   p <- new_NSSpeechRecognizer
   p `pokeRecognizer` recognizer
   return p
+
+{-|
+
+throws when not on main thread.
+
+the @NSRunLoop@ *must* be run on the main thread, otherwise.
+
+-}
+beginRunLoop = do
+  beginMainRunLoop
+  
+  -- isOnMainThread <- (==) <$> myThreadId <*> mainThreadId
+  -- if   isOnMainThread
+  -- then throwS "{NSSpeechRecognizer.Bindings.beginRunLoop} must be run on only the main thread"
+  -- else beginMainRunLoop
 
 --------------------------------------------------------------------------------
 
