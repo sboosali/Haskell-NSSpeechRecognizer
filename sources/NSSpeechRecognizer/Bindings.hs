@@ -9,11 +9,10 @@ import NSSpeechRecognizer.Types
 import NSSpeechRecognizer.Foreign
 import NSSpeechRecognizer.Constants
 
-import Foreign (Ptr)
-import Foreign.C (newCString)
-import Foreign.Marshal (withArrayLen,free)
-import Control.Concurrent (myThreadId)
--- import Control.Concurrent.STM
+import Foreign (Ptr,withArrayLen,free)
+import Foreign.C (newCString,peekCString)
+--import Control.Concurrent (myThreadId)
+import Control.Concurrent.STM (TChan,atomically,writeTChan)
 -- import Data.List (genericLength)
 
 --------------------------------------------------------------------------------
@@ -21,7 +20,7 @@ import Control.Concurrent (myThreadId)
 {-|
 
 -}
-newNSSpeechRecognizer :: Recognizer -> IO (Ptr NSSpeechRecognizer)
+newNSSpeechRecognizer :: Recognizer -> IO P'NSSpeechRecognizer
 newNSSpeechRecognizer recognizer = do
   p <- new_NSSpeechRecognizer
   p `pokeRecognizer` recognizer
@@ -29,18 +28,27 @@ newNSSpeechRecognizer recognizer = do
 
 {-|
 
-throws when not on main thread.
-
 the @NSRunLoop@ *must* be run on the main thread, otherwise.
 
+TODO throws when not on main thread.
+
 -}
+beginRunLoop :: IO ()
 beginRunLoop = do
   beginMainRunLoop
-  
+
   -- isOnMainThread <- (==) <$> myThreadId <*> mainThreadId
   -- if   isOnMainThread
   -- then throwS "{NSSpeechRecognizer.Bindings.beginRunLoop} must be run on only the main thread"
   -- else beginMainRunLoop
+
+-- | "reinvert control" with a channel.
+channelRecognitionHandler :: TChan String -> RecognitionHandler
+channelRecognitionHandler channel = handler
+  where
+  handler c_s = do
+    s <- peekCString c_s -- UTF8-decode
+    atomically . writeTChan channel $ s
 
 --------------------------------------------------------------------------------
 
@@ -57,18 +65,6 @@ pokeRecognizerHandler :: Ptr NSSpeechRecognizer -> RecognitionHandler -> IO ()
 pokeRecognizerHandler p handler = do
   hs_handler <- newRecognitionHandler handler
   p `registerHandler_NSSpeechRecognizer` hs_handler
-
--- -- |
--- pokeRecognizerChannel :: Ptr NSSpeechRecognizer -> TChan CString -> IO ()
--- pokeRecognizerChannel p channel = do
---     c_handler <- channelRecognitionHandler channel
---     p `registerHandler_NSSpeechRecognizer` c_handler  -- safe? thread-safe? prop atomic.
---
--- -- |
--- channelRecognitionHandler :: TChan CString -> IO (FunPtr RecognitionHandler)
--- channelRecognitionHandler channel = do
---   let handler = atomically . writeTChan channel
---   newRecognitionHandler handler
 
 --------------------------------------------------------------------------------
 

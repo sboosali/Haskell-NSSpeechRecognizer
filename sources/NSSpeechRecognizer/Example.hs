@@ -11,7 +11,7 @@ import Foreign.C.String (withCString,peekCString)
 import Foreign (FunPtr)
 -- import Control.Concurrent.STM (newTChanIO,readTChan, atomically)
 import Control.Monad (forever) -- ,replicateM_)
-import Control.Concurrent (forkIO,forkOS,threadDelay) -- 
+import Control.Concurrent (forkIO,forkOS,forkOn,threadCapability,myThreadId,threadDelay) -- 
 import Control.Exception (throwIO,AsyncException(..))
 
 --------------------------------------------------------------------------------
@@ -79,7 +79,7 @@ mainRecognizerBackground = do --TODO Try to get this to work on non-main threads
 
  let rHandler = printerHandler
 
- _ns_thread <- forkOS $ do
+ _ns_thread <- forkOnSameCapability {- forkOS -} $ do
    let recognizer = Recognizer {rState, rHandler}
    _ns_recognizer <- newNSSpeechRecognizer recognizer
    putStrLn "(NSSpeechRecognizer Started)"
@@ -87,6 +87,10 @@ mainRecognizerBackground = do --TODO Try to get this to work on non-main threads
    putStrLn "(NSRunLoop Ended)" -- shouldn't be seen, but is!
 
  hang
+
+forkOnSameCapability m = do
+  (i,_) <- threadCapability =<< myThreadId
+  forkOn i m
 
 {-TODO: why's it need 2 C-c?
 
@@ -130,3 +134,4 @@ But is it safe? With some system resource be freed?
 -}
 
 --------------------------------------------------------------------------------
+

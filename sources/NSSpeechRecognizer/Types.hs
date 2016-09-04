@@ -81,14 +81,16 @@ type BOOL = Int8
 see
 <https://developer.apple.com/library/mac/documentation/Cocoa/Reference/ApplicationKit/Classes/NSSpeechRecognizer_Class/>
 
-Naming: a bit of a lie, actually has type @Recognizer@,
-which
+Corresponds to @native/Recognizer.h@, which:
 
 * implements the @NSSpeechRecognizerDelegate@ interface, and
 * wraps a @NSSpeechRecognizer@ object.
 
 -}
 data NSSpeechRecognizer
+
+-- |
+type P'NSSpeechRecognizer = Ptr NSSpeechRecognizer
 
 {- |
 
