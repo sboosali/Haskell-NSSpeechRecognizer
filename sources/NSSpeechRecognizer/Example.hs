@@ -111,9 +111,16 @@ printerHandler c_recognition = do
 --------------------------------------------------------------------------------
 
 mainVoiceMap = do
-  recognizeVoiceMap
+  recognizeVoiceMap exampleVoiceMap
+
+exampleVoiceMap = self
+ where
+ vocabulary = fmap fst self
+ self = 
    [ "start listening"-: putStrLn "started listening" --TODO Extend example to actually enable more vocabularies in these two, on the recognition of start listening
    , "stop listening"-: throwIO UserInterrupt
+   , "testing" -: putStrLn "tested"
+   , "help" -: traverse_ putStrLn vocabulary
    ]
 
 {-old
