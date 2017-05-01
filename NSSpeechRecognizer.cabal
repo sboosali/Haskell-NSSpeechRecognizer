@@ -1,7 +1,18 @@
 name:                NSSpeechRecognizer
 version:             0.0.0
-synopsis:            TODO
-description:         TODO
+synopsis:            OSX dictation (voice commands), with minimal dependencies.
+description:        
+ bindings to NSSpeechRecognizer.h with a type-safe and memory-safe(?) API. 
+ .
+ for example, you can write a single file, which just maps a vocabulary to recognize (`:: Strings`) onto actions to execute (`:: IO ()`). 
+ .
+ The only non-GHC-boot dependencies are `microlens` and `data-default`, which themselves are light. 
+ .
+ transitive dependencies (eliding those necessarily included by the ghc installation):
+ .
+ <<NSSpeechRecognizer.png>>
+ .
+ 
 homepage:            http://github.com/sboosali/NSSpeechRecognizer#readme
 license:             BSD3
 license-file:        LICENSE
@@ -19,9 +30,10 @@ cabal-version:       >=1.10
 extra-source-files:
   README.md
   .gitignore
-  .travis.yml
-  HLint.hs
+  -- .travis.yml
+  -- HLint.hs
   stack.yaml
+  data/NSSpeechRecognizer.png
 
 source-repository head
   type:     git
